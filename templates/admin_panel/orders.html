@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">Order Analytics</h2>
+    <span class="badge bg-success fs-5">{{ orders.count }} Total Orders</span>
+</div>
+
+<div class="row">
+    <!-- CHART SECTION -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow border-0">
+            <div class="card-header bg-white fw-bold">Order Status Overview</div>
+            <div class="card-body">
+                <canvas id="orderChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="col-md-6">
+        <div class="row g-3">
+            <div class="col-6">
+                <div class="card bg-warning text-dark border-0 p-3 text-center">
+                    <h4>Pending</h4>
+                    <span class="fs-4 fw-bold">
+                        {% for label in chart_labels %}
+                            {% if "Pending" in label %}{{ forloop.counter0 }}{% endif %}
+                        {% endfor %}
+                        <!-- (Using JS for dynamic stats is better, but chart shows visuals) -->
+                         <i class="fa-solid fa-clock"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card bg-success text-white border-0 p-3 text-center">
+                    <h4>Revenue</h4>
+                    <i class="fa-solid fa-dollar-sign fa-2x"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECENT ORDERS TABLE -->
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-dark text-white">Recent Transactions</div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Buyer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for o in orders|slice:":8" %}
+                        <tr>
+                            <td>#{{ o.id }}</td>
+                            <td>{{ o.buyer.username }}</td>
+                            <td>${{ o.total_price }}</td>
+                            <td>
+                                <span class="badge {% if o.status == 'Pending' %}bg-warning text-dark{% elif o.status == 'Paid' %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ o.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center">No orders yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('orderChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar', // Bar chart for statuses
+            data: {
+                labels: {{ chart_labels|safe }},
+                datasets: [{
+                    label: 'Number of Orders',
+                    data: {{ chart_values|safe }},
+                    backgroundColor: '#D4AF37',
+                    borderColor: '#2C1A11',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

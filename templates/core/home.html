@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Custom Styles for Landing Page -->
+<style>
+    /* Floating Logo Animation */
+    h1{
+        font-size: 2.5rem;
+    }
+    .hero-logo {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+    /* Feature Cards */
+    .feature-card {
+        border: none;
+        border-radius: 15px;
+        background: #fff;
+        padding: 30px 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+
+    /* Icon Circles */
+    .icon-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 1.8rem;
+        transition: transform 0.3s;
+    }
+
+    .feature-card:hover .icon-circle {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    /* Specific Colors */
+    .icon-ai { background-color: #e3f2fd; color: #1976d2; }
+    .icon-market { background-color: #e8f5e9; color: #2e7d32; }
+    .icon-live { background-color: #fce4ec; color: #c2185b; }
+
+    /* Decorative Circle in Hero */
+    .hero-circle {
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        top: -100px;
+        right: -50px;
+    }
+</style>
+
+<div class="container pb-5">
+    
+    <!-- 1. HERO SECTION -->
+    <div class="hero-banner text-center">
+        <!-- Logo on Top -->
+        <img src="{% static 'img/logo_1.png' %}" alt="CoffeeCore Logo" class="hero-logo">
+        <h1 class="fw-bold mb-3">Global Coffee Export & Import</h1>
+    </div>
+
+
+    <!-- 2. FEATURES GRID -->
+    <div class="row g-4 mt-2">
+        
+        <!-- AI Agent Card -->
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="icon-circle icon-ai">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <h3 class="fw-bold mb-3">AI Smart Agent</h3>
+                <p class="text-muted small mb-4">
+                    Automated grading and instant support for export regulations and pricing.
+                </p>
+                <a href="{% url 'coming_soon' %}" class="btn btn-outline-secondary rounded-pill px-4 btn-sm">
+                    Coming Soon
+                </a>
+            </div>
+        </div>
+
+        <!-- Marketplace Card (Main) -->
+        <div class="col-md-4">
+            <div class="feature-card border border-warning border-2">
+                <div class="icon-circle icon-market">
+                    <i class="fa-solid fa-shop"></i>
+                </div>
+                <h3 class="fw-bold mb-3">Marketplace</h3>
+                <p class="text-muted small mb-4">
+                    Browse premium green, roasted, and ground coffee directly from verified sellers.
+                </p>
+                <a href="{% url 'product_list' %}" class="btn btn-dark rounded-pill px-4 btn-sm" style="background-color: #2C1A11;">
+                    Browse Coffee
+                </a>
+            </div>
+        </div>
+
+        <!-- Live Stream Card -->
+        <div class="col-md-4">
+            <div class="feature-card">
+                <div class="icon-circle icon-live">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                </div>
+                <h3 class="fw-bold mb-3">Live Auctions</h3>
+                <p class="text-muted small mb-4">
+                    Participate in real-time streaming auctions for exclusive harvest lots.
+                </p>
+                <a href="{% url 'coming_soon' %}" class="btn btn-outline-secondary rounded-pill px-4 btn-sm">
+                    Coming Soon
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 3. STATS STRIP (Professional Touch) -->
+    <div class="row mt-5 text-center">
+        <div class="col-md-4">
+            <h2 class="fw-bold text-success">{{ total_products|default:"0" }}+</h2>
+            <p class="text-muted uppercase small ls-1">Active Products</p>
+        </div>
+        <div class="col-md-4">
+            <h2 class="fw-bold text-warning">100%</h2>
+            <p class="text-muted uppercase small ls-1">Verified Sellers</p>
+        </div>
+        <div class="col-md-4">
+            <h2 class="fw-bold text-primary">24/7</h2>
+            <p class="text-muted uppercase small ls-1">Global Support</p>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

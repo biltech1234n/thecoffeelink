@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Internal CSS for this page's dropdowns -->
+<style>
+    /* Sleek Action Button */
+    .btn-action-trigger {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        color: #555;
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .btn-action-trigger:hover, .btn-action-trigger:focus {
+        background-color: #f8f9fa;
+        border-color: #ccc;
+        color: #2C1A11;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* Professional Dropdown Menu */
+    .custom-dropdown-menu {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        padding: 8px;
+        min-width: 200px;
+    }
+
+    /* Dropdown Items */
+    .custom-dropdown-item {
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        color: #444;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+    }
+    .custom-dropdown-item:hover {
+        background-color: #f4f4f4;
+        color: #000;
+    }
+    
+    /* Icons fixed width for alignment */
+    .custom-dropdown-item i {
+        width: 25px; 
+        text-align: center;
+    }
+
+    /* Specific Colors */
+    .item-success:hover { background-color: #d1e7dd; color: #0f5132; }
+    .item-primary:hover { background-color: #cfe2ff; color: #084298; }
+    .item-danger:hover { background-color: #f8d7da; color: #842029; }
+    
+    /* Headers */
+    .dropdown-header-custom {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #888;
+        padding: 5px 12px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Manage Orders</h2>
+        <span class="badge bg-primary rounded-pill px-3 py-2">{{ orders.count }} Total</span>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-3 text-secondary text-uppercase small">Order ID</th>
+                        <th class="text-secondary text-uppercase small">Product</th>
+                        <th class="text-secondary text-uppercase small">Buyer</th>
+                        <th class="text-secondary text-uppercase small">Amount</th>
+                        <th class="text-secondary text-uppercase small">Status</th>
+                        <th class="text-end pe-4 text-secondary text-uppercase small">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for o in orders %}
+                    <tr>
+                        <td class="ps-3 fw-bold text-muted">#{{ o.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if o.product.image %}
+                                    <img src="{{ o.product.image.url }}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: contain;">
+                                {% else %}
+                                    <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center border" style="width: 40px; height: 40px;">
+                                        <i class="fa-solid fa-mug-hot text-muted small"></i>
+                                    </div>
+                                {% endif %}
+                                <span class="fw-semibold text-dark">{{ o.product.name }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {{ o.buyer.username }}
+                                <a href="{% url 'chat_room' o.buyer.id %}" class="btn btn-sm btn-light ms-2 text-muted rounded-circle" style="width: 30px; height: 30px; padding: 0; display:flex; align-items:center; justify-content:center;" title="Message Buyer">
+                                    <i class="fa-solid fa-comment-dots"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td class="fw-bold text-dark">${{ o.total_price }}</td>
+                        <td>
+                            {% if o.status == 'Pending' %}
+                                <span class="badge bg-warning text-dark border border-warning-subtle"><i class="fa-regular fa-clock me-1"></i> Pending</span>
+                            {% elif o.status == 'Paid' or o.status == 'Accepted' %}
+                                <span class="badge bg-info text-dark border border-info-subtle"><i class="fa-solid fa-gears me-1"></i> Processing</span>
+                            {% elif o.status == 'Shipped' %}
+                                <span class="badge bg-primary border border-primary-subtle"><i class="fa-solid fa-truck-fast me-1"></i> On Shipping</span>
+                            {% elif o.status == 'Delivered' %}
+                                <span class="badge bg-success border border-success-subtle"><i class="fa-solid fa-check-circle me-1"></i> Delivered</span>
+                            {% elif o.status == 'Declined' %}
+                                <span class="badge bg-danger border border-danger-subtle"><i class="fa-solid fa-ban me-1"></i> Declined</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-3">
+                            
+                            <!-- PROFESSIONAL ACTION DROPDOWN -->
+                            <div class="dropdown">
+                                <button class="btn btn-action-trigger dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    Manage
+                                </button>
+                                
+                                <ul class="dropdown-menu dropdown-menu-end custom-dropdown-menu">
+                                    
+                                    <!-- SECTION 1: NEXT LOGICAL STEP (Workflow) -->
+                                    {% if o.status == 'Pending' %}
+                                        <li><h6 class="dropdown-header-custom">Next Step</h6></li>
+                                        <li>
+                                            <form method="post" class="m-0">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="order_id" value="{{ o.id }}">
+                                                <button name="action" value="accept" class="custom-dropdown-item item-success fw-bold">
+                                                    <i class="fa-solid fa-check text-success"></i> Accept Order
+                                                </button>
+                                            </form>
+                                        </li>
+                                    {% endif %}
+
+                                    {% if o.status == 'Paid' or o.status == 'Accepted' %}
+                                        <li><h6 class="dropdown-header-custom">Next Step</h6></li>
+                                        <li>
+                                            <form method="post" class="m-0">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="order_id" value="{{ o.id }}">
+                                                <button name="action" value="shipped" class="custom-dropdown-item item-primary fw-bold">
+                                                    <i class="fa-solid fa-truck-fast text-primary"></i> Start Shipping
+                                                </button>
+                                            </form>
+                                        </li>
+                                    {% endif %}
+
+                                    {% if o.status == 'Shipped' %}
+                                        <li><h6 class="dropdown-header-custom">Next Step</h6></li>
+                                        <li>
+                                            <form method="post" class="m-0">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="order_id" value="{{ o.id }}">
+                                                <button name="action" value="delivered" class="custom-dropdown-item item-success fw-bold">
+                                                    <i class="fa-solid fa-box-open text-success"></i> Mark Delivered
+                                                </button>
+                                            </form>
+                                        </li>
+                                    {% endif %}
+
+                                    <!-- SECTION 2: CORRECTIONS -->
+                                    {% if o.status != 'Pending' or o.status != 'Declined' %}
+                                        <li><hr class="dropdown-divider my-1"></li>
+                                        <li><h6 class="dropdown-header-custom">Corrections</h6></li>
+                                    {% endif %}
+
+                                    {% if o.status != 'Pending' %}
+                                    <li>
+                                        <form method="post" class="m-0">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="order_id" value="{{ o.id }}">
+                                            <button name="action" value="pending" class="custom-dropdown-item">
+                                                <i class="fa-solid fa-rotate-left text-muted"></i> Reset to Pending
+                                            </button>
+                                        </form>
+                                    </li>
+                                    {% endif %}
+
+                                    {% if o.status != 'Declined' and o.status != 'Delivered' %}
+                                    <li>
+                                        <form method="post" class="m-0">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="order_id" value="{{ o.id }}">
+                                            <button name="action" value="decline" class="custom-dropdown-item item-danger">
+                                                <i class="fa-solid fa-ban text-danger"></i> Decline Order
+                                            </button>
+                                        </form>
+                                    </li>
+                                    {% endif %}
+
+                                </ul>
+                            </div>
+
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-clipboard-list fa-2x mb-3 text-light-emphasis"></i>
+                            <p>No orders found.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

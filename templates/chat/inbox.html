@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fa-solid fa-envelope me-2"></i> Messages</h5>
+                    <span class="badge bg-warning text-dark">{{ rooms.count }} Conversations</span>
+                </div>
+                
+                <div class="list-group list-group-flush">
+                    {% for room in rooms %}
+                        
+                        <!-- LOGIC: Find out who the 'other' person is -->
+                        {% if room.participant_1 == user %}
+                            <!-- Current user is P1, so we chat with P2 -->
+                            <a href="{% url 'chat_room' room.participant_2.id %}" class="list-group-item list-group-item-action d-flex align-items-center p-3">
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                                    {{ room.participant_2.username|first|upper }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold">{{ room.participant_2.username }}</h6>
+                                    <small class="text-muted">Click to open chat</small>
+                                </div>
+                                <small class="text-muted ms-auto">{{ room.updated_at|date:"M d, H:i" }}</small>
+                            </a>
+                        
+                        {% else %}
+                            <!-- Current user is P2, so we chat with P1 -->
+                            <a href="{% url 'chat_room' room.participant_1.id %}" class="list-group-item list-group-item-action d-flex align-items-center p-3">
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 1.2rem;">
+                                    {{ room.participant_1.username|first|upper }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold">{{ room.participant_1.username }}</h6>
+                                    <small class="text-muted">Click to open chat</small>
+                                </div>
+                                <small class="text-muted ms-auto">{{ room.updated_at|date:"M d, H:i" }}</small>
+                            </a>
+                        {% endif %}
+
+                    {% empty %}
+                        <div class="text-center py-5">
+                            <i class="fa-regular fa-comments fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No messages yet.</h5>
+                            <p class="small text-muted">Contact a seller from the marketplace to start a chat.</p>
+                            <a href="{% url 'product_list' %}" class="btn btn-sm btn-outline-dark">Go to Market</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

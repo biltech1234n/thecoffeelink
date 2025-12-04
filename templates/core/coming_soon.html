@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container text-center py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Icon -->
+            <div class="mb-4">
+                <i class="fa-solid fa-rocket fa-5x" style="color: var(--gold);"></i>
+            </div>
+            
+            <!-- Heading -->
+            <h1 class="display-4 fw-bold" style="color: var(--coffee-dark);">Coming Soon</h1>
+            
+            <!-- Description -->
+            <p class="lead text-muted my-4">
+                We are currently building this cutting-edge feature. 
+                <br>
+                <strong>AI Coffee Agent</strong> and <strong>Live Stream Stream</strong> will be available in the next update.
+            </p>
+
+            <!-- Progress Bar (Visual decoration) -->
+            <div class="progress mb-4" style="height: 10px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" 
+                     role="progressbar" style="width: 75%"></div>
+            </div>
+
+            <!-- Back Button -->
+            <a href="{% url 'home' %}" class="btn btn-primary btn-lg px-5" 
+               style="background-color: var(--secondary-color); border: none;">
+                <i class="fa-solid fa-arrow-left me-2"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Chat Container Styles */
+    .chat-card {
+        height: 85vh;
+        display: flex;
+        flex-direction: column;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    /* Message Bubbles */
+    .message-bubble {
+        position: relative;
+        min-width: 150px;
+        max-width: 75%;
+        padding: 12px 16px;
+        border-radius: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+    .msg-dropdown {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        opacity: 0;
+        transition: opacity 0.2s;
+        cursor: pointer;
+    }
+    .message-bubble:hover .msg-dropdown { 
+        opacity: 1; 
+    }
+
+    /* Specific User Styles */
+    .msg-me {
+        background-color: #2C1A11; /* Coffee Dark */
+        color: #fff;
+        border-bottom-right-radius: 2px;
+    }
+    .msg-other {
+        background-color: #ffffff;
+        color: #333;
+        border: 1px solid #f0f0f0;
+        border-bottom-left-radius: 2px;
+    }
+
+    /* Meta text (Time, Edited) */
+    .msg-meta {
+        font-size: 0.7rem;
+        margin-top: 4px;
+        text-align: right;
+        opacity: 0.7;
+    }
+    .msg-edited-tag {
+        font-size: 0.65rem;
+        font-style: italic;
+        opacity: 0.6;
+        margin-left: 5px;
+    }
+    .deleted-text {
+        font-style: italic;
+        color: #999;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-9"> <!-- Made slightly wider for better desktop view -->
+            <div class="card chat-card shadow-lg border-0">
+                
+                <!-- 1. CHAT HEADER -->
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <a href="{% url 'chat_inbox' %}" class="btn btn-sm btn-light rounded-circle me-3 border">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
+                        
+                        <!-- User Avatar -->
+                        <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" 
+                             style="width: 45px; height: 45px; font-weight: bold; font-size: 1.2rem;">
+                            {{ other_user.username|first|upper }}
+                        </div>
+                        
+                        <div>
+                            <h5 class="mb-0 fw-bold">{{ other_user.username }}</h5>
+                            <small class="text-success"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Online</small>
+                        </div>
+                    </div>
+
+                    <!-- Clear Chat Menu -->
+                    <div class="dropdown">
+                        <button class="btn btn-light btn-sm rounded-circle" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li>
+                                <button class="dropdown-item text-danger" onclick="clearChat()">
+                                    <i class="fa-solid fa-trash-can me-2"></i> Clear Chat History
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 2. CHAT HISTORY AREA -->
+                <div class="card-body bg-light overflow-auto" id="chat-history">
+                    <div class="d-flex flex-column gap-3" id="msg-container">
+                        <!-- Messages load here via Server Template + JS -->
+                        {% for message in chat_messages %}
+                            {% include 'chat/single_message.html' %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 3. INPUT AREA -->
+                <div class="card-footer bg-white border-top p-3">
+                    <form id="chat-form" class="d-flex align-items-center gap-2">
+                        <input type="text" id="msg-input" class="form-control form-control-lg border-0 bg-light" 
+                               placeholder="Type your message..." required autocomplete="off" style="font-size: 0.95rem;">
+                        
+                        <button type="submit" class="btn btn-warning text-dark rounded-circle shadow-sm" 
+                                style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. EDIT MESSAGE MODAL -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title fw-bold">Edit Message</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="edit-input" class="form-control">
+                <input type="hidden" id="edit-msg-id">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-dark btn-sm" onclick="submitEdit()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JAVASCRIPT LOGIC -->
+<script>
+    const roomId = "{{ room.id }}";
+    const currentUserId = "{{ user.id }}";
+    const chatHistory = document.getElementById("chat-history");
+    
+    // Set last check time (Current time in seconds)
+    let lastCheckTime = Math.floor(Date.now() / 1000); 
+
+    // Scroll to bottom on load
+    function scrollToBottom() {
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+    scrollToBottom();
+
+    // --- 1. SEND MESSAGE ---
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const input = document.getElementById('msg-input');
+        const content = input.value.trim();
+        if(!content) return;
+
+        fetch(`{% url 'api_send_message' room.id %}`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            body: JSON.stringify({'content': content})
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                input.value = '';
+                // Append message locally immediately
+                appendMessage(data.message_id, content, data.time, true, false, false);
+            }
+        });
+    });
+
+    // --- 2. POLL FOR UPDATES (Every 2 Seconds) ---
+    setInterval(() => {
+        fetch(`{% url 'api_get_updates' room.id %}?last_check=${lastCheckTime}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.server_time) lastCheckTime = data.server_time;
+
+            // A. Add NEW Messages
+            if(data.new_messages.length > 0) {
+                data.new_messages.forEach(msg => {
+                    // CRITICAL FIX: Only add if ID doesn't exist AND it's not from me (I already added mine)
+                    if (!document.getElementById(`msg-row-${msg.id}`)) {
+                        if (msg.sender_id != currentUserId) {
+                            appendMessage(msg.id, msg.content, msg.time, false, msg.is_deleted, false);
+                        }
+                    }
+                });
+            }
+
+            // B. Update EDITED/DELETED Messages
+            if(data.updated_messages.length > 0) {
+                data.updated_messages.forEach(msg => {
+                    const contentEl = document.getElementById(`msg-content-${msg.id}`);
+                    if(contentEl) {
+                        if(msg.is_deleted) {
+                            contentEl.innerHTML = `<span class="deleted-text"><i class="fa-solid fa-ban me-1"></i> This message was deleted.</span>`;
+                        } else {
+                            let newHTML = msg.content;
+                            if(msg.is_edited) newHTML += `<span class="msg-edited-tag">(edited)</span>`;
+                            contentEl.innerHTML = newHTML;
+                        }
+                    }
+                });
+            }
+        });
+    }, 2000);
+
+    // --- 3. APPEND MESSAGE HELPER ---
+    function appendMessage(id, content, time, isMe, isDeleted, isEdited) {
+        // FAILSAFE: If ID exists, stop immediately (Prevents Duplication)
+        if (document.getElementById(`msg-row-${id}`)) return;
+
+        const alignClass = isMe ? 'justify-content-end' : 'justify-content-start';
+        const bubbleClass = isMe ? 'msg-me' : 'msg-other';
+        
+        // Handling Content Display (Deleted vs Normal)
+        let contentDisplay = isDeleted ? 
+            `<span class="deleted-text"><i class="fa-solid fa-ban me-1"></i> This message was deleted.</span>` : 
+            content;
+        
+        if(isEdited && !isDeleted) contentDisplay += `<span class="msg-edited-tag">(edited)</span>`;
+
+        // Action Dropdown (Only for Me and Active messages)
+        let dropdownHTML = '';
+        if(isMe && !isDeleted) {
+            // Safe quotes escaping for JS function call
+            const safeContent = content.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            dropdownHTML = `
+                <div class="dropdown msg-dropdown-trigger">
+                    <i class="fa-solid fa-ellipsis-vertical text-white-50" data-bs-toggle="dropdown"></i>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <li><a class="dropdown-item small" href="#" onclick="openEdit(${id}, '${safeContent}')"><i class="fa-solid fa-pen me-2"></i> Edit</a></li>
+                        <li><a class="dropdown-item small text-danger" href="#" onclick="deleteMsg(${id}, 'everyone')"><i class="fa-solid fa-trash me-2"></i> Delete from Everyone</a></li>
+                        <li><a class="dropdown-item small" href="#" onclick="deleteMsg(${id}, 'me')"><i class="fa-solid fa-eye-slash me-2"></i> Delete from Me</a></li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        const html = `
+            <div class="d-flex ${alignClass}" id="msg-row-${id}">
+                <div class="message-bubble ${bubbleClass}">
+                    ${dropdownHTML}
+                    <span id="msg-content-${id}">${contentDisplay}</span>
+                    <div class="msg-meta">
+                        ${time}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('msg-container').insertAdjacentHTML('beforeend', html);
+        scrollToBottom();
+    }
+
+    // --- 4. ACTIONS (Delete/Edit/Clear) ---
+    
+    function deleteMsg(id, scope) {
+        if(!confirm("Are you sure?")) return;
+        
+        fetch("{% url 'api_manage_message' %}", {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            body: JSON.stringify({'action': scope === 'me' ? 'delete_me' : 'delete_everyone', 'message_id': id})
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'hidden') {
+                document.getElementById(`msg-row-${id}`).remove();
+            } else if (data.status === 'deleted') {
+                document.getElementById(`msg-content-${id}`).innerHTML = `<span class="deleted-text"><i class="fa-solid fa-ban me-1"></i> This message was deleted.</span>`;
+            }
+        });
+    }
+
+    function openEdit(id, content) {
+        document.getElementById('edit-msg-id').value = id;
+        document.getElementById('edit-input').value = content;
+        new bootstrap.Modal(document.getElementById('editModal')).show();
+    }
+
+    function submitEdit() {
+        const id = document.getElementById('edit-msg-id').value;
+        const newContent = document.getElementById('edit-input').value;
+        
+        fetch("{% url 'api_manage_message' %}", {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            body: JSON.stringify({'action': 'edit', 'message_id': id, 'new_content': newContent})
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'edited') {
+                // Update UI immediately
+                const el = document.getElementById(`msg-content-${id}`);
+                el.innerText = data.new_content;
+                el.innerHTML += `<span class="msg-edited-tag">(edited)</span>`;
+                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+            }
+        });
+    }
+
+    function clearChat() {
+        if(!confirm("Clear chat history? This only hides it for you.")) return;
+        fetch(`{% url 'api_clear_chat' room.id %}`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': '{{ csrf_token }}'}
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'cleared') {
+                document.getElementById('msg-container').innerHTML = '';
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm mb-2">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+            <h2 class="fw-bold text-dark">
+                {% if profile.company_name %}
+                    {{ profile.company_name }}
+                {% else %}
+                    {{ seller.username }}'s Business
+                {% endif %}
+            </h2>
+            <p class="text-muted mb-0">Verified Seller Profile</p>
+        </div>
+        
+        <!-- Contact Button -->
+        {% if user.is_authenticated and user != seller %}
+            <a href="{% url 'chat_room' seller.id %}" class="btn btn-dark">
+                <i class="fa-solid fa-envelope me-2"></i> Contact Seller
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- 1. IDENTITY BADGES -->
+    <div class="card shadow-sm border-0 mb-4 bg-light">
+        <div class="card-body d-flex align-items-center flex-wrap gap-2">
+            <span class="fw-bold me-2 text-uppercase text-secondary">Roles:</span>
+            
+            {% if profile.is_farmer %}
+                <span class="badge bg-success rounded-pill px-3 py-2"><i class="fa-solid fa-leaf me-1"></i> Farmer</span>
+            {% endif %}
+            
+            {% if profile.is_roaster %}
+                <span class="badge bg-danger rounded-pill px-3 py-2"><i class="fa-solid fa-fire me-1"></i> Roaster</span>
+            {% endif %}
+            
+            {% if profile.is_exporter %}
+                <span class="badge bg-primary rounded-pill px-3 py-2"><i class="fa-solid fa-plane-departure me-1"></i> Exporter</span>
+            {% endif %}
+            
+            {% if profile.is_supplier %}
+                <span class="badge bg-warning text-dark rounded-pill px-3 py-2"><i class="fa-solid fa-truck me-1"></i> Supplier</span>
+            {% endif %}
+
+            {% if not profile.is_farmer and not profile.is_roaster and not profile.is_exporter and not profile.is_supplier %}
+                <span class="badge bg-secondary rounded-pill px-3 py-2">General Seller</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 2. PUBLIC STATS -->
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100" style="border-left: 5px solid #2C1A11 !important;">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small fw-bold">Member Since</h6>
+                    <h3 class="fw-bold text-dark mb-0">{{ seller.date_joined|date:"M Y" }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100" style="border-left: 5px solid #D4AF37 !important;">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small fw-bold">Active Products</h6>
+                    <h3 class="fw-bold text-dark mb-0">{{ active_products }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100" style="border-left: 5px solid #28a745 !important;">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small fw-bold">Successful Orders</h6>
+                    <h3 class="fw-bold text-dark mb-0">{{ successful_orders }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

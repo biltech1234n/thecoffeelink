@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-4">
+                
+                <div class="card-header text-white text-center py-4" style="background-color: var(--secondary-color); border-radius: 15px 15px 0 0;">
+                    <h3 class="mb-0 fw-bold"><i class="fa-solid fa-mug-hot text-warning me-2"></i>Create Account</h3>
+                    <p class="mb-0 text-white-50">Join the Global Coffee Marketplace</p>
+                </div>
+
+                <div class="card-body p-4 bg-white">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-muted small">{{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-warning w-100 fw-bold">
+                                Register
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-footer text-center bg-light py-3 border-0">
+                    <small class="text-muted">Already have an account? 
+                        <a href="{% url 'login' %}" class="fw-bold text-decoration-none" style="color: var(--secondary-color);">Log In</a>
+                    </small>
+                    <br>
+                    <small class="text-muted"> 
+                        <a href="{% url 'seller_login' %}" class="fw-bold text-decoration-none" style="color: var(--secondary-color);">Seller Account</a> If you're Merchant?
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script to style inputs -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var inputs = document.querySelectorAll('input, select');
+        inputs.forEach(function(field) {
+            field.classList.add('form-control');
+        });
+    });
+</script>
+{% endblock %}

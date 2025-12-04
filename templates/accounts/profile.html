@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        
+        <!-- LEFT: Profile Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow border-0 text-center p-4 h-100">
+                <div class="card-body">
+                    <!-- Avatar Circle -->
+                    <div class="mx-auto rounded-circle d-flex align-items-center justify-content-center mb-3 shadow-sm border border-4 border-white" 
+                         style="width: 100px; height: 100px; font-size: 2.5rem; font-weight: bold; background: var(--secondary-color); color: #fff;">
+                        {{ user.username|first|upper }}
+                    </div>
+                    
+                    <h4 class="fw-bold mb-1">{{ user.username }}</h4>
+                    <p class="text-muted mb-2">{{ user.email }}</p>
+                    
+                    <!-- Role Badge -->
+                    <div class="mb-4">
+                        {% if user.role == 'admin' %}
+                            <span class="badge bg-danger">ADMINISTRATOR</span>
+                        {% elif user.role == 'seller' %}
+                            <span class="badge bg-success">VERIFIED SELLER</span>
+                        {% else %}
+                            <span class="badge bg-info text-dark">BUYER</span>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <!-- Stats -->
+                    <div class="row text-start mt-4">
+                        <div class="col-12 mb-2">
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Account Status</small>
+                            <div class="fw-bold text-success">
+                                <i class="fa-solid fa-circle-check me-1"></i> Active
+                            </div>
+                        </div>
+                        <div class="col-12 mb-2">
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Date Joined</small>
+                            <div class="fw-bold">{{ user.date_joined|date:"M d, Y" }}</div>
+                        </div>
+                        {% if user.role == 'seller' %}
+                        <div class="col-12">
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">Verification</small>
+                            <div>
+                                {% if user.is_verified %}
+                                    <span class="text-success fw-bold"><i class="fa-solid fa-certificate"></i> Verified</span>
+                                {% else %}
+                                    <span class="text-warning fw-bold"><i class="fa-solid fa-clock"></i> Pending</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Edit Details -->
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold"><i class="fa-solid fa-user-pen me-2"></i> Edit Profile</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">First Name</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Last Name</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Email Address</label>
+                            {{ form.email }}
+                            <div class="form-text">We'll never share your email with anyone else.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Username</label>
+                            <input type="text" class="form-control" value="{{ user.username }}" disabled readonly>
+                            <div class="form-text">Username cannot be changed.</div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Password Change Link (Optional) -->
+                            
+                            <a href="{% url 'change_password' %}" class="text-decoration-none text-muted small hover-gold">
+                                <i class="fa-solid fa-key"></i> Change Password
+                            </a>
+                            
+                            <button type="submit" class="btn btn-dark px-4 fw-bold" style="background-color: var(--secondary-color);">
+                                Save Changes
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

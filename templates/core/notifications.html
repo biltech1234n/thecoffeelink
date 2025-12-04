@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    
+    <!-- Header with Action Buttons -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <h3 class="fw-bold mb-0">
+            <i class="fa-solid fa-bell me-2 text-warning"></i> Notification History
+        </h3>
+        
+        {% if all_notifs %}
+        <div class="d-flex gap-2">
+            <!-- Mark All Read -->
+            <form action="{% url 'mark_all_read' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="fa-solid fa-check-double me-1"></i> Read All
+                </button>
+            </form>
+
+            <!-- Delete All -->
+            <form action="{% url 'delete_all_notifications' %}" method="post" onsubmit="return confirm('Are you sure you want to delete ALL notifications? This cannot be undone.');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="fa-solid fa-trash me-1"></i> Clear All
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Notification List -->
+    <div class="list-group shadow-sm">
+        {% for n in all_notifs %}
+        <div class="list-group-item list-group-item-action {% if not n.is_read %}bg-light border-start border-4 border-warning{% endif %}">
+            <div class="d-flex w-100 justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <!-- Icon based on type -->
+                    <div class="me-3 fs-5">
+                        {% if n.notification_type == 'order' %}
+                            <i class="fa-solid fa-box-open text-success"></i>
+                        {% elif n.notification_type == 'message' %}
+                            <i class="fa-solid fa-comment-dots text-primary"></i>
+                        {% else %}
+                            <i class="fa-solid fa-bell text-secondary"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <h6 class="mb-1 fw-semibold text-dark">{{ n.message }}</h6>
+                        <small class="text-muted">
+                            <i class="fa-regular fa-clock me-1"></i>{{ n.created_at|date:"M d, Y - H:i" }}
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Status Badge (Optional visual) -->
+                {% if not n.is_read %}
+                    <span class="badge bg-warning text-dark rounded-pill ms-2" style="font-size: 0.7rem;">New</span>
+                {% endif %}
+            </div>
+            
+            <!-- Clickable Link Overlay -->
+            <a href="{% url 'mark_read' n.id %}" class="stretched-link"></a>
+        </div>
+        {% empty %}
+        <div class="text-center py-5 bg-white rounded border">
+            <i class="fa-regular fa-bell-slash fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">You have no notifications.</h5>
+            <p class="small text-muted">We will notify you when important events happen.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

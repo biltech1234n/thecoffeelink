@@ -1,0 +1,39 @@
+<div class="d-flex {% if message.sender == user %}justify-content-end{% else %}justify-content-start{% endif %} mb-2" id="msg-row-{{ message.id }}">
+    <div class="p-3 rounded-3 shadow-sm message-bubble" 
+         style="max-width: 75%; 
+                {% if message.sender == user %}
+                    background-color: #2C1A11; color: #fff; border-bottom-right-radius: 0 !important;
+                {% else %}
+                    background-color: #fff; color: #333; border-bottom-left-radius: 0 !important;
+                {% endif %}">
+
+        <!-- Dropdown for Sender -->
+        {% if message.sender == user and not message.is_deleted_everyone %}
+        <div class="dropdown msg-dropdown">
+            <i class="fa-solid fa-ellipsis-vertical text-white-50" data-bs-toggle="dropdown"></i>
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li><a class="dropdown-item small" href="#" onclick="openEdit({{ message.id }}, '{{ message.content|escapejs }}')"><i class="fa-solid fa-pen me-2"></i> Edit</a></li>
+                <li><a class="dropdown-item small text-danger" href="#" onclick="deleteMsg({{ message.id }}, 'everyone')"><i class="fa-solid fa-trash me-2"></i> Delete from Everyone</a></li>
+                <li><a class="dropdown-item small" href="#" onclick="deleteMsg({{ message.id }}, 'me')"><i class="fa-solid fa-eye-slash me-2"></i> Delete from Me</a></li>
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Content -->
+        <span id="msg-content-{{ message.id }}">
+            {% if message.is_deleted_everyone %}
+                <span class="deleted-msg"><i class="fa-solid fa-ban me-1"></i> This message was deleted.</span>
+            {% else %}
+                {{ message.content }} {% if message.is_edited %}<small class="opacity-50">(edited)</small>{% endif %}
+            {% endif %}
+        </span>
+        
+        <!-- Time -->
+        <div class="text-end mt-1" style="font-size: 0.7rem; opacity: 0.7;">
+            {{ message.timestamp|date:"H:i" }}
+            {% if message.is_read and message.sender == user %}
+                <i class="fa-solid fa-check-double ms-1 text-info"></i>
+            {% endif %}
+        </div>
+    </div>
+</div>

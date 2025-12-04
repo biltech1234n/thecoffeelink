@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header text-white py-3" style="background-color: var(--secondary-color); text-align: center; border-radius: 15px 15px 0 0;">
+                    <h4 class="mb-3 mt-3"><i class="fa-solid fa-boxes-packing text-warning"></i> Seller Application</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">Join CoffeeCore to export your beans globally. Legal verification required.</p>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.username.label_tag }} {{ form.username }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.email.label_tag }} {{ form.email }}
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                {{ form.first_name.label_tag }} {{ form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.last_name.label_tag }} {{ form.last_name }}
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        <h6 class="fw-bold text-success">Required Documents</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Import/Export License</label>
+                            {{ form.business_license }}
+                            <div class="form-text">Must be a valid PDF or Image.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">National ID Card</label>
+                            {{ form.id_card }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Password</label>
+                            {{ form.check_password }} <!-- Just use standard form rendering in real usage -->
+                            <!-- For simplicity using as_p logic below if fields get complex -->
+                        </div>
+                        
+                        <!-- RENDER REMAINING FIELDS (Passwords) -->
+                        {% for field in form %}
+                            {% if field.name not in "username email first_name last_name business_license id_card" %}
+                            <div class="mb-3">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                <div class="text-danger small">{{ field.errors }}</div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <button class="btn btn-warning w-100 fw-bold">Submit Application</button>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-light py-3 border-0 rounded-bottom-4">
+                    <small class="text-muted">Already have a Seller account? 
+                        <a href="{% url 'seller_login' %}" class="fw-bold text-decoration-none" style="color: var(--secondary-color);">Login</a> 
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>document.querySelectorAll('input').forEach(i => i.classList.add('form-control'));</script>
+{% endblock %}

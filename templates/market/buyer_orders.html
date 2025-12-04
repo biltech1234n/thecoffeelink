@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold"><i class="fa-solid fa-bag-shopping me-2"></i> My Orders</h2>
+        <a href="{% url 'product_list' %}" class="btn btn-outline-dark btn-sm">
+            <i class="fa-solid fa-arrow-left"></i> Back to Market
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">Order ID</th>
+                        <th>Product</th>
+                        <th>Seller</th>
+                        <th>Qty / Price</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-muted">#{{ order.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if order.product.image %}
+                                    <img src="{{ order.product.image.url }}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: contain;">
+                                {% else %}
+                                    <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="fa-solid fa-mug-hot text-muted small"></i>
+                                    </div>
+                                {% endif %}
+                                <span class="fw-bold text-dark">{{ order.product.name }}</span>
+                            </div>
+                        </td>
+                        <td>{{ order.product.seller.username }}</td>
+                        <td>
+                            <span class="d-block">{{ order.quantity }} kg</span>
+                            <span class="text-success fw-bold">${{ order.total_price }}</span>
+                        </td>
+                        <td class="text-muted small">{{ order.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            {% if order.status == 'Pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif order.status == 'Accepted' or order.status == 'Paid' %}
+                                <span class="badge bg-success">Processing</span>
+                            {% elif order.status == 'Declined' %}
+                                <span class="badge bg-danger">Declined</span>
+                            {% elif order.status == 'Shipped' %}
+                                <span class="badge bg-info text-dark">Shipped</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Chat with Seller -->
+                            <a href="{% url 'chat_room' order.product.seller.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fa-solid fa-comment"></i> Chat
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fa-solid fa-basket-shopping fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">You haven't ordered anything yet.</h5>
+                            <a href="{% url 'product_list' %}" class="btn btn-warning mt-2">Start Shopping</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

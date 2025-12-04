@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    
+    <!-- Back Button -->
+    <a href="{% url 'product_list' %}" class="btn btn-outline-secondary mb-4">
+        <i class="fa-solid fa-arrow-left"></i> Back to Market
+    </a>
+
+    <div class="card shadow-lg border-0 overflow-hidden">
+        <div class="row g-0">
+            
+            <!-- LEFT: Product Image -->
+            <div class="col-md-6 bg-light d-flex align-items-center justify-content-center">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="img-fluid" style="max-height: 500px; width: 100%; object-fit: contain;">
+                {% else %}
+                    <i class="fa-solid fa-mug-hot fa-5x text-secondary py-5"></i>
+                {% endif %}
+            </div>
+
+            <!-- RIGHT: Details & Order Form -->
+            <div class="col-md-6">
+                <div class="card-body p-5">
+                    
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="badge bg-secondary mb-2">{{ product.category }}</span>
+                            <h2 class="fw-bold mb-1" style="color: #2C1A11;">{{ product.name }}</h2>
+                            <div class="d-flex align-items-center mb-1">
+                                <p class="text-muted small mb-0 me-2">Seller: {{ product.seller.username }}</p>
+                                
+                                <!-- View Profile Button -->
+                                <a href="{% url 'public_seller_profile' product.seller.id %}" class="btn btn-sm btn-outline-dark" style="font-size: 0.7rem; padding: 2px 8px;">
+                                    <i class="fa-solid fa-store me-1"></i> View Business Profile
+                                </a>
+                            </div>
+                        </div>
+                        <h3 class="text-success fw-bold">${{ product.price }} <small class="text-muted fs-6">/kg</small></h3>
+                    </div>
+
+                    <hr>
+
+                    <!-- Description -->
+                    <h5 class="fw-bold mt-4">Description</h5>
+                    <p class="text-muted" style="line-height: 1.6;">
+                        {{ product.description }}
+                    </p>
+
+                    <hr class="my-4">
+
+                    <!-- ACTIONS AREA -->
+                    {% if user.is_authenticated %}
+                        
+                        <!-- 1. Contact Seller Button -->
+                        <div class="d-grid mb-3">
+                            <a href="{% url 'chat_room' product.seller.id %}" class="btn btn-outline-dark">
+                                <i class="fa-solid fa-comment me-2"></i> Contact Seller
+                            </a>
+                        </div>
+
+                        <!-- 2. Order Form -->
+                        <form action="{% url 'create_order' product.id %}" method="post" class="mt-4 p-4 bg-light rounded-3">
+                            {% csrf_token %}
+                            <label class="form-label fw-bold">Order Quantity (kg)</label>
+                            
+                            <div class="input-group mb-3">
+                                <input type="number" name="quantity" class="form-control form-control-lg" value="1" min="1" id="qtyInput">
+                                <span class="input-group-text">kg</span>
+                            </div>
+
+                            <!-- Dynamic Total Calculation (Visual Only) -->
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Estimated Total:</span>
+                                <span class="fw-bold fs-5" id="totalPrice">${{ product.price }}</span>
+                            </div>
+
+                            <button type="submit" class="btn btn-warning w-100 btn-lg fw-bold shadow-sm">
+                                Place Order
+                            </button>
+                        </form>
+
+                    {% else %}
+                        <!-- Guest View -->
+                        <div class="alert alert-warning text-center">
+                            Please <a href="{% url 'login' %}?next={{ request.path }}" class="fw-bold text-dark">Login</a> to chat with the seller or place an order.
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Script to Update Total Price Dynamically -->
+<script>
+    const pricePerKg = {{ product.price }};
+    const qtyInput = document.getElementById('qtyInput');
+    const totalDisplay = document.getElementById('totalPrice');
+
+    if(qtyInput){
+        qtyInput.addEventListener('input', function() {
+            let qty = this.value;
+            if(qty < 1) qty = 1;
+            let total = (qty * pricePerKg).toFixed(2);
+            totalDisplay.innerText = "$" + total;
+        });
+    }
+</script>
+{% endblock %}

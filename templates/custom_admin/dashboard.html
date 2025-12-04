@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <h2 class="fw-bold">Admin Dashboard</h2>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="col-md-4">
+        <div class="card bg-primary text-white p-3 shadow-sm border-0">
+            <h3>{{ total_products }}</h3>
+            <span>Total Products</span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white p-3 shadow-sm border-0">
+            <h3>{{ total_orders }}</h3>
+            <span>Total Orders</span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-dark p-3 shadow-sm border-0">
+            <h3>5</h3> <!-- Placeholder for Users -->
+            <span>Active Users</span>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <!-- Quick Actions -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white fw-bold">Management</div>
+            <div class="card-body">
+                <a href="{% url 'admin_product_list' %}" class="btn btn-outline-dark w-100 mb-2">Manage Products</a>
+                <a href="{% url 'admin_order_list' %}" class="btn btn-outline-dark w-100">View All Orders</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

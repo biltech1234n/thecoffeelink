@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>User Management</h2>
+<table class="table table-hover bg-white shadow-sm rounded">
+    <thead class="bg-dark text-white">
+        <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>License Docs</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in users %}
+        <tr>
+            <td>
+                {{ u.username }} <br>
+                <small class="text-muted">{{ u.email }}</small>
+            </td>
+            <td><span class="badge bg-secondary">{{ u.role }}</span></td>
+            <td>
+                {% if u.is_active and u.is_verified %}
+                    <span class="badge bg-success">Active</span>
+                {% elif not u.is_active %}
+                    <span class="badge bg-danger">Suspended</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if u.is_seller and u.verification_doc %}
+                    <a href="{{ u.verification_doc.business_license.url }}" target="_blank">View License</a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                <form method="post" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ u.id }}">
+                    
+                    {% if not u.is_verified %}
+                        <button name="action" value="approve" class="btn btn-sm btn-success">Approve</button>
+                    {% endif %}
+                    
+                    {% if u.is_active %}
+                        <button name="action" value="suspend" class="btn btn-sm btn-outline-danger">Suspend</button>
+                    {% else %}
+                        <button name="action" value="unsuspend" class="btn btn-sm btn-outline-primary">Restore</button>
+                    {% endif %}
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

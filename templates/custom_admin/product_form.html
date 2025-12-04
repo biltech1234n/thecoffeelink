@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">{% if product %}Edit{% else %}Add{% endif %} Product</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Product Name</label>
+                            <input type="text" name="name" class="form-control" value="{{ product.name|default:'' }}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category</label>
+                                <select name="category" class="form-select">
+                                    <option value="Green" {% if product.category == 'Green' %}selected{% endif %}>Green Coffee Beans</option>
+                                    <option value="Roasted" {% if product.category == 'Roasted' %}selected{% endif %}>Roasted Coffee</option>
+                                    <option value="Ground" {% if product.category == 'Ground' %}selected{% endif %}>Ground Coffee</option>
+                                    <option value="Equipment" {% if product.category == 'Equipment' %}selected{% endif %}>Equipment</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Price ($)</label>
+                                <input type="number" step="0.01" name="price" class="form-control" value="{{ product.price|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="4" required>{{ product.description|default:'' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Product Image</label>
+                            <input type="file" name="image" class="form-control">
+                            {% if product.image %}
+                                <div class="mt-2">
+                                    <small>Current:</small> <img src="{{ product.image.url }}" width="50">
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Save Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

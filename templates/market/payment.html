@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Checkout</h2>
+<p>Product: {{ order.product.name }}</p>
+<p>Total: ${{ order.product.price }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="alert alert-info">Simulating Secure Payment...</div>
+    <button type="submit" class="btn btn-success btn-lg">Pay Now (Mock)</button>
+</form>
+{% endblock %}
