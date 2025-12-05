@@ -711,6 +711,14 @@ textarea.w-input, textarea.w-select {
 }
 
 @media screen and (max-width: 991px) {
+  .right_nav{
+    position: relative;
+    right: 0%;
+  }
+  .right_nav_2{
+    position: relative;
+    right: 0%;
+  }
   .w-container {
     max-width: 728px;
   }
