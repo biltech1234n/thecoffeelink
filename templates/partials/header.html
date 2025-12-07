@@ -45,7 +45,10 @@
                 <i class="fa-solid fa-comments me-2"></i> Buyer Messages
             </a>
             <a href="{% url 'coming_soon' %}" class="{% if request.resolver_match.url_name == 'coming_soon' %}active{% endif %}">
-                <i class="fa-solid fa-tv me-2"></i> AI & Live Stream
+                <i class="fa-solid fa-robot me-2"></i> AI Hub
+            </a>
+            <a href="{% url 'coming_soon_2' %}" class="{% if request.resolver_match.url_name == 'coming_soon_2' %}active{% endif %}">
+                <i class="fa-solid fa-tv me-2"></i> Live Stream
             </a>
         
         <!-- ================= BUYER/GUEST MENU ================= -->
