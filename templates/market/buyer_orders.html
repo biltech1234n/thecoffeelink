@@ -38,7 +38,18 @@
                                 <span class="fw-bold text-dark">{{ order.product.name }}</span>
                             </div>
                         </td>
-                        <td>{{ order.product.seller.username }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <!-- Profile Icon -->
+                                <a href="{% url 'view_business_profile' order.product.seller.id %}"
+                                class="btn btn-sm btn-light ms-2 text-muted rounded-circle"
+                                style="width: 30px; height: 30px; padding: 0; display:flex; align-items:center; justify-content:center;"
+                                title="View Seller Profile">
+                                    <i class="fa-solid fa-user"></i>
+                                </a>
+                                {{ order.product.seller.username }}
+                            </div>
+                        </td>
                         <td>
                             <span class="d-block">{{ order.quantity }} kg</span>
                             <span class="text-success fw-bold">${{ order.total_price }}</span>
