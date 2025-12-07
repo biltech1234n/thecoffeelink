@@ -92,10 +92,21 @@
                     
                     <div class="mt-auto pt-3">
                         {% if user.is_authenticated %}
-                            <!-- LOGGED IN: Go to Detail Page -->
-                            <a href="{% url 'product_detail' product.id %}" class="btn btn-warning w-100 fw-bold">
-                                Order Now
-                            </a>
+                            
+                            <!-- CHECK ROLE -->
+                            {% if user.role == 'seller' %}
+                                <!-- PRO STYLE: Disabled/Info Button for Sellers -->
+                                <button class="btn w-100 d-flex align-items-center justify-content-center" disabled 
+                                        style="background-color: #f8f9fa; color: #adb5bd; border: 1px dashed #dee2e6; font-weight: 600; cursor: not-allowed; height: 38px;">
+                                    <i class="fa-solid fa-lock me-2" style="font-size: 0.8rem;"></i> To Order Login By Buyer
+                                </button>
+                            {% else %}
+                                <!-- BUYER: Standard Order Button -->
+                                <a href="{% url 'product_detail' product.id %}" class="btn btn-warning w-100 fw-bold">
+                                    Order Now
+                                </a>
+                            {% endif %}
+
                         {% else %}
                             <!-- GUEST: Redirect to Login -->
                             <a href="{% url 'login' %}?next={% url 'product_detail' product.id %}" class="btn btn-outline-dark w-100">
