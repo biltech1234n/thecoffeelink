@@ -110,6 +110,14 @@
                         <td>
                             <div class="d-flex align-items-center">
                                 {{ o.buyer.username }}
+                                <!-- PROFILE ICON -->
+                                <a href="{% url 'view_business_profile' o.buyer.id %}"
+                                    class="btn btn-sm btn-light ms-2 text-muted rounded-circle"
+                                    style="width: 30px; height: 30px; padding: 0; display:flex; align-items:center; justify-content:center;"
+                                    title="View Buyer Profile">
+                                        <i class="fa-solid fa-user"></i>
+                                </a>
+
                                 <a href="{% url 'chat_room' o.buyer.id %}" class="btn btn-sm btn-light ms-2 text-muted rounded-circle" style="width: 30px; height: 30px; padding: 0; display:flex; align-items:center; justify-content:center;" title="Message Buyer">
                                     <i class="fa-solid fa-comment-dots"></i>
                                 </a>
