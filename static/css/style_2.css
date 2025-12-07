@@ -5734,6 +5734,11 @@ blockquote {
 }
 
 @media screen and (max-width: 991px) {
+  .left_nav_h ,
+  .right_nav_h {
+    display: block;
+    position: relative;
+  }
   h1 {
     font-size: 64px;
   }
