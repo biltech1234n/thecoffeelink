@@ -10,3 +10,5 @@ Pillow
 gunicorn
 cloudinary
 django-cloudinary-storage
+stripe
+requests
