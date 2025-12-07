@@ -44,6 +44,9 @@
             <a href="{% url 'chat_inbox' %}" class="{% if request.resolver_match.url_name == 'chat_inbox' %}active{% endif %}">
                 <i class="fa-solid fa-comments me-2"></i> Buyer Messages
             </a>
+            <a href="{% url 'business_directory' %}" class="{% if request.resolver_match.url_name == 'business_directory' %}active{% endif %}">
+                <i class="fa-solid fa-address-book me-2"></i> Business Directory
+            </a>
             <a href="{% url 'product_list' %}" class="{% if request.resolver_match.url_name == 'product_list' %}active{% endif %}">
                 <i class="fa-solid fa-shop me-2"></i> Marketplace
             </a>
