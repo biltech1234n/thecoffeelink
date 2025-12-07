@@ -109,7 +109,7 @@ def unified_register_view(request):
         if request.user.role == User.SELLER:
             return redirect('seller_dashboard')
         elif request.user.role == User.BUYER:
-            return redirect('buyer_dashboard')
+            return redirect('home')
         return redirect('admin_dashboard')
 
     if request.method == 'POST':
@@ -130,7 +130,7 @@ def unified_register_view(request):
             if user.role == User.SELLER:
                 return redirect('seller_dashboard')
             else:
-                return redirect('buyer_dashboard')
+                return redirect('home')
     else:
         # We initialize with the Seller form because it contains the superset of fields
         # (including file uploads). The template handles hiding them for buyers.
