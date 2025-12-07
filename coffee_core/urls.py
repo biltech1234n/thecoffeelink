@@ -9,16 +9,19 @@ from core import views as core_views
 from market import views as market_views
 from accounts import views as auth_views
 from chat import views as chat_views
-from core.views import mark_notification_read, all_notifications
+from core.views import mark_notification_read, all_notifications, coming_soon_2
 from chat import views as chat_views 
 from accounts.views import ChangePasswordView 
 from market import views
+
 
 urlpatterns = [
     # --- MARKETING SITE ---
     # Access this at http://127.0.0.1:8000/welcome_home/
     path('welcome_home/', core_views.marketing_home, name='landing_page'), 
     path('about/', core_views.marketing_about, name='about'),
+    path('producers/', core_views.marketing_producers, name='producers'),
+    path('roasters/', core_views.marketing_roasters, name='roasters'),
     path('shop-info/', core_views.marketing_shop, name='marketing_shop'),
     path('contact/', core_views.marketing_contact, name='contact'),
     
@@ -26,21 +29,18 @@ urlpatterns = [
     path('admin-site/', admin.site.urls), # Renamed to avoid confusion
     path('logout/', django_auth_views.LogoutView.as_view(next_page='home'), name='logout'),
     
-    # Generic Login (Default)
-    path('login/', auth_views.buyer_login, name='login'), 
-    path('register/', auth_views.buyer_register, name='register'),
+    # Unified Buyer & Seller Auth
+    path('login/', auth_views.unified_login_view, name='login'),
+    path('register/', auth_views.unified_register_view, name='register'),
     
-    # Specific Role Auth Paths
+    
     path('auth/admin/login/', auth_views.admin_login, name='admin_login'),
     path('auth/admin/register/', auth_views.admin_register, name='admin_register'),
-    path('auth/seller/login/', auth_views.seller_login, name='seller_login'),
-    path('auth/seller/register/', auth_views.seller_register, name='seller_register'),
-    path('auth/buyer/login/', auth_views.buyer_login, name='buyer_login'),
-    path('auth/buyer/register/', auth_views.buyer_register, name='buyer_register'),
 
     # --- CORE PAGES ---
     path('', core_views.home, name='home'),
     path('features/future/', core_views.coming_soon, name='coming_soon'),
+    path('features/future_2/', core_views.coming_soon_2, name='coming_soon_2'),
     path('login-redirect/', core_views.login_redirect_view, name='login_redirect'),
 
     # --- ADMIN PANEL (Updated to use Analytics views) ---
@@ -58,8 +58,15 @@ urlpatterns = [
     path('market/', market_views.product_list, name='product_list'),
     path('market/product/<int:product_id>/', market_views.product_detail, name='product_detail'),
     path('market/order/<int:product_id>/', market_views.create_order, name='create_order'),
-    path('market/pay/<int:order_id>/', market_views.payment_page, name='payment_page'),
     path('market/my-orders/', market_views.buyer_orders, name='buyer_orders'),
+    # path('market/pay/<int:order_id>/', market_views.payment_page, name='payment_page'),
+
+    # --- PAYMENT ---
+    path('payment/<int:order_id>/', market_views.payment, name='payment'),
+    path('stripe/<int:order_id>/', market_views.stripe_checkout, name='stripe_checkout'),
+    path('chapa/<int:order_id>/', market_views.chapa_checkout, name='chapa_checkout'),
+    path('payment-success/', market_views.payment_success, name='payment_success'),
+
 
     # --- CHAT ---
     path('messages/', chat_views.chat_inbox, name='chat_inbox'),
@@ -84,8 +91,9 @@ urlpatterns = [
     # ... business paths ...
     path('seller/business-profile/', views.business_profile, name='business_profile'),
     path('seller/cert/delete/<int:cert_id>/', views.delete_certificate, name='delete_certificate'),
-    path('market/seller/<int:seller_id>/', views.public_seller_profile, name='public_seller_profile'),
-    
+    path('market/seller/<int:seller_id>/', views.public_business_profile, name='public_business_profile'),
+    path('business-profile/<int:user_id>/', views.view_business_profile, name='view_business_profile'),
+
     path('directory/', views.business_directory, name='business_directory'),
 ]
 
