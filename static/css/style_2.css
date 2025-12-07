@@ -5738,6 +5738,7 @@ blockquote {
   .right_nav_h {
     display: block;
     position: relative;
+    right: 0%;
   }
   h1 {
     font-size: 64px;
