@@ -16,8 +16,11 @@ DEBUG = 'RENDER' not in os.environ
 ALLOWED_HOSTS = ['*']
 
 # CSRF Trust for Render URLs
-CSRF_TRUSTED_ORIGINS = ['https://*.onrender.com']
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://thecoffeelink-0qke.onrender.com',  # Your original Render URL
+    'https://thecoffeelink.co',                 # Your new domain
+    'https://www.thecoffeelink.co'              # Your new domain with www
+]
 # --- INSTALLED APPS (Order is Critical) ---
 INSTALLED_APPS = [
     'daphne',
