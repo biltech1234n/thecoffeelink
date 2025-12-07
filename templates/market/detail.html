@@ -32,7 +32,7 @@
                                 <p class="text-muted small mb-0 me-2">Seller: {{ product.seller.username }}</p>
                                 
                                 <!-- View Profile Button -->
-                                <a href="{% url 'public_seller_profile' product.seller.id %}" class="btn btn-sm btn-outline-dark" style="font-size: 0.7rem; padding: 2px 8px;">
+                                <a href="{% url 'public_business_profile' product.seller.id %}" class="btn btn-sm btn-outline-dark" style="font-size: 0.7rem; padding: 2px 8px;">
                                     <i class="fa-solid fa-store me-1"></i> View Business Profile
                                 </a>
                             </div>
@@ -109,4 +109,4 @@
         });
     }
 </script>
-{% endblock %}
+{% endblock %} 
