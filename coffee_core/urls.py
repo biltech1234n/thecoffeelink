@@ -18,7 +18,8 @@ from market import views
 urlpatterns = [
     # --- MARKETING SITE ---
     # Access this at http://127.0.0.1:8000/welcome_home/
-    path('welcome_home/', core_views.marketing_home, name='landing_page'), 
+    path('', core_views.marketing_home, name='landing_page'), 
+    # path('welcome_home/', core_views.marketing_home, name='landing_page'), 
     path('about/', core_views.marketing_about, name='about'),
     path('producers/', core_views.marketing_producers, name='producers'),
     path('roasters/', core_views.marketing_roasters, name='roasters'),
@@ -38,7 +39,7 @@ urlpatterns = [
     path('auth/admin/register/', auth_views.admin_register, name='admin_register'),
 
     # --- CORE PAGES ---
-    path('', core_views.home, name='home'),
+    path('home/', core_views.home, name='home'),
     path('features/future/', core_views.coming_soon, name='coming_soon'),
     path('features/future_2/', core_views.coming_soon_2, name='coming_soon_2'),
     path('login-redirect/', core_views.login_redirect_view, name='login_redirect'),
