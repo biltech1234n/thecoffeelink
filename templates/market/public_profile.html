@@ -242,9 +242,20 @@
                                 {{ product.description|truncatechars:50 }}
                             </p>
                             
-                            <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-dark btn-sm rounded-pill btn_2_c px-3">
-                                View Details
-                            </a>
+                            <!-- UPDATED LOGIC FOR BUTTON -->
+                            {% if user.is_authenticated and user.role == 'seller' %}
+                                <!-- Disabled Button for Sellers (Pro Style) -->
+                                <button class="btn btn-sm rounded-pill w-100" disabled 
+                                        style="background-color: #f8f9fa; color: #adb5bd; border: 1px dashed #dee2e6; font-weight: 600; cursor: not-allowed; padding: 0.5rem;">
+                                    <i class="fa-solid fa-lock me-1"></i> To Order Login By Buyer
+                                </button>
+                            {% else %}
+                                <!-- Original Button for Buyers/Guests -->
+                                <a href="{% url 'product_detail' product.id %}" class="btn btn-outline-dark btn-sm rounded-pill btn_2_c px-3">
+                                    View Details
+                                </a>
+                            {% endif %}
+                            
                         </div>
                     </div>
                 </div>
