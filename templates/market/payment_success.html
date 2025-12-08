@@ -90,7 +90,7 @@
         </p>
 
         <!-- Replace '/' with {% url 'home' %} if you have a home url name -->
-        <a href="/" class="btn-home">Return to Home Now</a>
+        <a href="{% url 'home' %}" class="btn-home">Return to Home Now</a>
     </div>
 
     <script>
@@ -107,7 +107,7 @@
                 clearInterval(countdownTimer);
                 // 3. Redirect when time hits 0
                 // Change '/' to your specific home URL path if different
-                window.location.href = "/"; 
+                window.location.href = "{% url 'home' %}"; 
             }
         }, 1000);
     </script>
