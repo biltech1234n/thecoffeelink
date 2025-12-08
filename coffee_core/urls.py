@@ -66,8 +66,10 @@ urlpatterns = [
     path('payment/<int:order_id>/', market_views.payment, name='payment'),
     path('stripe/<int:order_id>/', market_views.stripe_checkout, name='stripe_checkout'),
     path('chapa/<int:order_id>/', market_views.chapa_checkout, name='chapa_checkout'),
-    path('payment-success/', market_views.payment_success, name='payment_success'),
-
+    # path('payment-success/', market_views.payment_success, name='payment_success'),
+    
+    path('payment-success/<int:order_id>/', views.payment_success, name='payment_success'),
+    path('order/cancel/<int:order_id>/', views.cancel_order, name='cancel_order'),
 
     # --- CHAT ---
     path('messages/', chat_views.chat_inbox, name='chat_inbox'),
